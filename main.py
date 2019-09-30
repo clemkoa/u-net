@@ -1,15 +1,25 @@
 import os
 import numpy as np
 import torch
-from torch import nn
+import torch.optim as optim
 import torch.nn.functional as F
 
 from dataset import load_train_dataset
 from unet import UNet
+
 data_folder = 'data'
+model_path = 'model/unet.pt'
 
-train_images, train_labels = load_train_dataset(data_folder)
+def train():
+    model = UNet()
+    optimizer = optim.Adam(model.parameters(), lr = 0.001)
+    for (input, label) in load_train_dataset(data_folder):
+        output = model(torch.from_numpy(input.astype(np.float32)))
+        loss = F.binary_cross_entropy(output, torch.from_numpy(label // 255).float())
 
-model = UNet()
-for train_image in train_images:
-    print(model(torch.from_numpy(train_image.astype(np.float32))))
+        loss.backward()
+        optimizer.step()
+        torch.save(model.state_dict(), model_path)
+    return
+
+train()
