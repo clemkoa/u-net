@@ -13,19 +13,14 @@ model_path = 'model/unet.pt'
 
 def train():
     model = UNet()
-    optimizer = optim.Adam(model.parameters(), lr = 0.0003)
+    optimizer = optim.SGD(model.parameters(), lr = 0.0003)
     for (input, label, weight) in load_train_dataset(data_folder):
         target = torch.from_numpy(label // 255).float()
         output = model(torch.from_numpy(input.astype(np.float32))).reshape((512, 512, 2))
         weight = torch.from_numpy(weight)
         weight = weight.repeat(2, 1).reshape(output.shape)
-        loss = F.binary_cross_entropy(output, target, weight=weight.float())
 
-        input_array = input.reshape((512, 512))
-        input_img = Image.fromarray(input_array)
-        input_img.show()
-
-
+        loss = F.binary_cross_entropy(output, target)
         loss.backward()
         optimizer.step()
         print(loss)
