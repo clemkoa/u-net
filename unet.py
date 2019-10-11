@@ -75,6 +75,10 @@ class UNet(nn.Module):
         self.up4 = up_layer(128, 64)
         self.last_conv = last_conv(64, 2)
 
+        # if model_path:
+        #     checkpoint = torch.load(model_path)
+        #     self.load_state_dict(checkpoint)
+
     def forward(self, x):
         x1 = self.conv1(x)
         x2 = self.down1(x1)
