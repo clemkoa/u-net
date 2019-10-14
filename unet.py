@@ -20,16 +20,14 @@ class double_conv(nn.Module):
 class up(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(up, self).__init__()
-        self.up_scale = nn.ConvTranspose2d(in_ch // 2, in_ch // 2, 2, stride=2)
+        self.up_scale = nn.ConvTranspose2d(in_ch, out_ch, 2, stride=2)
 
     def forward(self, x1, x2):
-        x1 = self.up_scale(x1)
-        # input is CHW
-        diffY = x2.size()[2] - x1.size()[2]
-        diffX = x2.size()[3] - x1.size()[3]
+        x2 = self.up_scale(x2)
+        diffY = x1.size()[2] - x2.size()[2]
+        diffX = x1.size()[3] - x2.size()[3]
 
-        x1 = F.pad(x1, (diffX // 2, diffX - diffX // 2, diffY // 2, diffY - diffY // 2))
-
+        x2 = F.pad(x2, (diffX // 2, diffX - diffX // 2, diffY // 2, diffY - diffY // 2))
         x = torch.cat([x2, x1], dim=1)
         return x
 
@@ -42,21 +40,54 @@ class last_conv(nn.Module):
         x = self.conv(x)
         return x
 
+class down_layer(nn.Module):
+    def __init__(self, in_ch, out_ch):
+        super(down_layer, self).__init__()
+        self.pool = nn.MaxPool2d(2, stride=2, padding=0)
+        self.conv = double_conv(in_ch, out_ch)
+
+    def forward(self, x):
+        x = self.conv(self.pool(x))
+        return x
+
+class up_layer(nn.Module):
+    def __init__(self, in_ch, out_ch):
+        super(up_layer, self).__init__()
+        self.up = up(in_ch, out_ch)
+        self.conv = double_conv(in_ch, out_ch)
+
+    def forward(self, x1, x2):
+        a = self.up(x1, x2)
+        x = self.conv(a)
+        return x
+
 class UNet(nn.Module):
     def __init__(self):
         super(UNet, self).__init__()
-        self.first_conv = double_conv(1, 64)
-        self.first_pool = nn.MaxPool2d(2, stride=2, padding=0)
-        self.second_conv = double_conv(64, 64)
-        self.first_up = up(128, 64)
-        self.third_conv = double_conv(128, 64)
+        self.conv1 = double_conv(1, 64)
+        self.down1 = down_layer(64, 128)
+        self.down2 = down_layer(128, 256)
+        self.down3 = down_layer(256, 512)
+        self.down4 = down_layer(512, 1024)
+        self.up1 = up_layer(1024, 512)
+        self.up2 = up_layer(512, 256)
+        self.up3 = up_layer(256, 128)
+        self.up4 = up_layer(128, 64)
         self.last_conv = last_conv(64, 2)
 
+        # if model_path:
+        #     checkpoint = torch.load(model_path)
+        #     self.load_state_dict(checkpoint)
+
     def forward(self, x):
-        x1 = self.first_conv(x)
-        x1_pool = self.first_pool(x1)
-        x2 = self.second_conv(x1_pool)
-        x2_up = self.first_up(x2, x1)
-        x3 = self.third_conv(x2_up)
-        output = self.last_conv(x3)
+        x1 = self.conv1(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        x1_up = self.up1(x4, x5)
+        x2_up = self.up2(x3, x1_up)
+        x3_up = self.up3(x2, x2_up)
+        x4_up = self.up4(x1, x3_up)
+        output = self.last_conv(x4_up)
         return F.sigmoid(output)

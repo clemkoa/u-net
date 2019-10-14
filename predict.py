@@ -17,11 +17,11 @@ def predict():
     checkpoint = torch.load(model_path)
     model.load_state_dict(checkpoint)
     for input in load_test_dataset(data_folder):
-        output = model(torch.from_numpy(input.astype(np.float32))).detach().numpy()
+        output = model(torch.from_numpy(input.astype(np.float32))).permute(0, 2, 3, 1).detach().numpy()
         input_array = input.reshape((512, 512))
-        output_array = output.argmax(1).reshape((512, 512)) * 255
+        output_array = output.argmax(3).reshape((512, 512)) * 255
         input_img = Image.fromarray(input_array)
-        output_img = PIL.ImageOps.invert(Image.fromarray(output_array.astype(dtype=np.uint16)).convert('L'))
+        output_img = Image.fromarray(output_array.astype(dtype=np.uint16)).convert('L')
         input_img.show()
         output_img.show()
     return
