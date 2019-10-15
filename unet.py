@@ -62,7 +62,7 @@ class up_layer(nn.Module):
         return x
 
 class UNet(nn.Module):
-    def __init__(self):
+    def __init__(self, dimensions=2):
         super(UNet, self).__init__()
         self.conv1 = double_conv(1, 64)
         self.down1 = down_layer(64, 128)
@@ -73,11 +73,7 @@ class UNet(nn.Module):
         self.up2 = up_layer(512, 256)
         self.up3 = up_layer(256, 128)
         self.up4 = up_layer(128, 64)
-        self.last_conv = last_conv(64, 2)
-
-        # if model_path:
-        #     checkpoint = torch.load(model_path)
-        #     self.load_state_dict(checkpoint)
+        self.last_conv = last_conv(64, dimensions)
 
     def forward(self, x):
         x1 = self.conv1(x)
