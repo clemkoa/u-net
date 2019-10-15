@@ -13,7 +13,7 @@ def load_train_dataset(data_folder):
     return zip(images, labels.reshape((30, 512, 512, 2)))
 
 def load_test_dataset(data_folder):
-    path_test_images = os.path.join(data_folder, 'train-volume.tif')
+    path_test_images = os.path.join(data_folder, 'test-volume.tif')
 
     images = np.array([[[np.array(page)]] for page in ImageSequence.Iterator(Image.open(path_test_images))])
     return images
