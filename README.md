@@ -11,14 +11,11 @@ The main differences with the paper are:
 - no padding in the pooling, which makes handling dimensions easier
 - no weight balancing in the softmax to deal with class inbalance
 
-## Bibliography:
-- https://github.com/milesial/Pytorch-UNet
-
 ## Example dataset
 
 The example dataset is from the ISBI Challenge. More information here: http://brainiac2.mit.edu/isbi_challenge/.
 
-A few outputs from the test dataset:
+A few outputs from the test dataset, after 200 iterations:
 
 ![Output image 2](public/image2.png)
 
@@ -50,3 +47,6 @@ python train.py
 ```
 python predict.py
 ```
+
+## Bibliography:
+- https://github.com/milesial/Pytorch-UNet
