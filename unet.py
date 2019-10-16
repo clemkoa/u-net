@@ -24,20 +24,7 @@ class up(nn.Module):
 
     def forward(self, x1, x2):
         x2 = self.up_scale(x2)
-        diffY = x1.size()[2] - x2.size()[2]
-        diffX = x1.size()[3] - x2.size()[3]
-
-        x2 = F.pad(x2, (diffX // 2, diffX - diffX // 2, diffY // 2, diffY - diffY // 2))
         x = torch.cat([x2, x1], dim=1)
-        return x
-
-class last_conv(nn.Module):
-    def __init__(self, in_ch, out_ch):
-        super(last_conv, self).__init__()
-        self.conv = nn.Conv2d(in_ch, out_ch, 1)
-
-    def forward(self, x):
-        x = self.conv(x)
         return x
 
 class down_layer(nn.Module):
@@ -73,7 +60,7 @@ class UNet(nn.Module):
         self.up2 = up_layer(512, 256)
         self.up3 = up_layer(256, 128)
         self.up4 = up_layer(128, 64)
-        self.last_conv = last_conv(64, dimensions)
+        self.last_conv = nn.Conv2d(64, dimensions, 1)
 
     def forward(self, x):
         x1 = self.conv1(x)
