@@ -15,7 +15,7 @@ The main differences with the paper are:
 
 The example dataset is from the ISBI Challenge. More information here: http://brainiac2.mit.edu/isbi_challenge/.
 
-A few outputs from the test dataset, after 200 iterations:
+A few outputs from the test dataset, after 300 iterations:
 
 ![Output image 2](public/image2.png)
 
