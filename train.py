@@ -27,13 +27,15 @@ def train():
         target = torch.from_numpy(label).float()
         output = model(torch.from_numpy(input.astype(np.float32))).permute(0, 2, 3, 1)
         loss = F.binary_cross_entropy(output, target)
-        print(loss)
+        step_loss = loss.item()
+        print(f'Epoch: {epoch} \tLoss: {step_loss}')
 
         loss.backward()
         optimizer.step()
 
-        if epoch % saving_interval == 0:
+        if (epoch + 1) % saving_interval == 0:
             print('Saving model')
+
             torch.save(model.state_dict(), model_path)
     torch.save(model.state_dict(), model_path)
     return
