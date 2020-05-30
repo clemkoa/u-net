@@ -17,6 +17,7 @@ class double_conv(nn.Module):
         x = self.conv(x)
         return x
 
+
 class up(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(up, self).__init__()
@@ -26,6 +27,7 @@ class up(nn.Module):
         x2 = self.up_scale(x2)
         x = torch.cat([x2, x1], dim=1)
         return x
+
 
 class down_layer(nn.Module):
     def __init__(self, in_ch, out_ch):
@@ -37,6 +39,7 @@ class down_layer(nn.Module):
         x = self.conv(self.pool(x))
         return x
 
+
 class up_layer(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(up_layer, self).__init__()
@@ -47,6 +50,7 @@ class up_layer(nn.Module):
         a = self.up(x1, x2)
         x = self.conv(a)
         return x
+
 
 class UNet(nn.Module):
     def __init__(self, dimensions=2):
@@ -73,4 +77,4 @@ class UNet(nn.Module):
         x3_up = self.up3(x2, x2_up)
         x4_up = self.up4(x1, x3_up)
         output = self.last_conv(x4_up)
-        return F.sigmoid(output)
+        return F.softmax(output, dim=1)
