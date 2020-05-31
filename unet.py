@@ -8,8 +8,10 @@ class double_conv(nn.Module):
         super(double_conv, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
             nn.ReLU(inplace=True)
         )
 
@@ -77,4 +79,4 @@ class UNet(nn.Module):
         x3_up = self.up3(x2, x2_up)
         x4_up = self.up4(x1, x3_up)
         output = self.last_conv(x4_up)
-        return F.softmax(output, dim=1)
+        return output

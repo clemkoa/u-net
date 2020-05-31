@@ -14,7 +14,7 @@ import torchvision.models as models
 from torchvision import transforms, utils
 import torch
 
-from dataset import load_train_dataset, load_test_dataset, CellDataset
+from dataset import CellDataset
 from unet import UNet
 
 data_folder = 'data'
@@ -24,20 +24,14 @@ epoch_number = 200
 
 
 def train():
-    transform = transforms.Compose(
-        [transforms.RandomHorizontalFlip(),
-         transforms.RandomVerticalFlip(),
-         transforms.ToTensor()])
-
-    cell_dataset = CellDataset(data_folder, transform=transform)
+    cell_dataset = CellDataset(data_folder)
     model = UNet(dimensions=2)
-    # if os.path.isfile(model_path):
-    #     model.load_state_dict(torch.load(model_path))
-    optimizer = optim.RMSprop(model.parameters(), lr=0.001)
-    training_dataset = list(load_train_dataset(data_folder))
+    if os.path.isfile(model_path):
+        model.load_state_dict(torch.load(model_path))
+    optimizer = optim.RMSprop(model.parameters(), lr=0.0001, weight_decay=1e-8, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
     for epoch in range(epoch_number):
-        i = random.randint(0, len(training_dataset) - 1)
+        i = random.randint(0, len(cell_dataset) - 1)
         input, target = cell_dataset[i]
         optimizer.zero_grad()
         output = model(input)
