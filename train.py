@@ -18,7 +18,7 @@ from dataset import CellDataset
 from unet import UNet
 
 data_folder = 'data'
-model_path = 'model/unet.pt'
+model_path = 'model/unet-cell.pt'
 saving_interval = 50
 epoch_number = 200
 
@@ -27,7 +27,7 @@ def train():
     cell_dataset = CellDataset(data_folder)
     model = UNet(dimensions=2)
     if os.path.isfile(model_path):
-        model.load_state_dict(torch.load(model_path))
+        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     optimizer = optim.RMSprop(model.parameters(), lr=0.0001, weight_decay=1e-8, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
     for epoch in range(epoch_number):

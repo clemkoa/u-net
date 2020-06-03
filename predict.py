@@ -11,15 +11,15 @@ model_path = 'model/unet.pt'
 
 def predict():
     model = UNet()
-    checkpoint = torch.load(model_path)
+    checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
     cell_dataset = CellDataset(data_folder, eval=True)
     model.load_state_dict(checkpoint)
     model.eval()
     for i in range(len(cell_dataset)):
         input, _ = cell_dataset[i]
-        output = model(input).permute(0, 2, 3, 1).detach().numpy()
-        input_array = input.detach().numpy().reshape((512, 512))
-        output_array = output.argmax(3).reshape((512, 512)) * 255
+        output = model(input).permute(0, 2, 3, 1).squeeze().detach().numpy()
+        input_array = input.squeeze().detach().numpy()
+        output_array = output.argmax(2) * 255
         input_img = Image.fromarray(input_array)
         output_img = Image.fromarray(output_array.astype(dtype=np.uint16)).convert('L')
         input_img.show()

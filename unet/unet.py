@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-
+import torch.nn.functional as F
 
 class double_conv(nn.Module):
     def __init__(self, in_ch, out_ch):
@@ -26,6 +26,12 @@ class up(nn.Module):
 
     def forward(self, x1, x2):
         x2 = self.up_scale(x2)
+
+        diffY = x1.size()[2] - x2.size()[2]
+        diffX = x1.size()[3] - x2.size()[3]
+
+        x2 = F.pad(x2, [diffX // 2, diffX - diffX // 2,
+                        diffY // 2, diffY - diffY // 2])
         x = torch.cat([x2, x1], dim=1)
         return x
 
