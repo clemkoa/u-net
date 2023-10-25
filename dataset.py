@@ -15,10 +15,10 @@ class CellDataset(Dataset):
         self.build_dataset()
 
     def build_dataset(self):
-        self._input_folder = os.path.join(self._data_folder, 'input')
-        self._label_folder = os.path.join(self._data_folder, 'target')
+        self._input_folder = os.path.join(self._data_folder, "input")
+        self._label_folder = os.path.join(self._data_folder, "target")
         if self._eval:
-            self._path_images = os.path.join(self._data_folder, 'eval')
+            self._path_images = os.path.join(self._data_folder, "eval")
             self._path_labels = self._path_images
         self._images = glob.glob(self._input_folder + "/*")
         self._labels = glob.glob(self._label_folder + "/*")
@@ -28,8 +28,12 @@ class CellDataset(Dataset):
         return len(self._images)
 
     def __getitem__(self, idx):
-        image = torch.from_numpy(img_as_ubyte(resize(rgb2gray(io.imread(self._images[idx])), (514, 616))))
-        label = torch.from_numpy(resize(rgb2gray(io.imread(self._labels[idx])), (514, 616))).long()
+        image = torch.from_numpy(
+            img_as_ubyte(resize(rgb2gray(io.imread(self._images[idx])), (514, 616)))
+        )
+        label = torch.from_numpy(
+            resize(rgb2gray(io.imread(self._labels[idx])), (514, 616))
+        ).long()
         if random.randint(0, 1):
             image = image.flip(0)
             label = label.flip(0)
