@@ -3,7 +3,6 @@ from PIL import Image
 import torch
 
 from unet import UNet
-from dataset import CellDataset
 from torchvision import transforms, utils, datasets
 
 data_folder = "data"
@@ -30,22 +29,20 @@ def predict():
     model.eval()
     for i, batch in enumerate(cell_dataset):
         input, _ = batch
-        print(input.shape)
-        # output = model(input).permute(0, 2, 3, 1).squeeze().detach().numpy()
-        output = model(input).squeeze().detach().numpy()
+        output = model(input).detach()
         input_array = input.squeeze().detach().numpy()
-        output_array = output[3]
-        print(output_array.shape)
-        print(output.max())
-        print(input_array)
+        output_array = output.argmax(dim=1)
+        # Simple conversion to black and white.
+        # Everything class 0 is background, make everything else white.
+        # This is bad for images with several classes.
+        output_array = torch.where(output_array > 0, 255, 0)
         input_img = Image.fromarray(input_array * 255)
-        print(output_array.astype(dtype=np.uint16)* 10)
         input_img.show()
-        for i in range(22):
-            output_array = output[i]
-            output_img = Image.fromarray(output_array.astype(dtype=np.uint16)).convert("L")
-            output_img.show()
-        break
+        output_img = Image.fromarray(output_array.squeeze().numpy().astype(dtype=np.uint16)).convert("L")
+        output_img.show()
+        # Just showing first ten images. Change as you wish!
+        if i > 10:
+            break
     return
 
 
