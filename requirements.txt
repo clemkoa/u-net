@@ -18,7 +18,7 @@ filelock==3.9.0
 fsspec==2023.9.2
 gmpy2==2.1.2
 idna==3.4
-imagecodecs==2023.1.23
+imagecodecs==2023.9.18
 imageio==2.31.4
 importlib-metadata==6.0.0
 Jinja2==3.1.2
