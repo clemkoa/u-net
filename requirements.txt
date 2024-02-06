@@ -11,7 +11,7 @@ conda-content-trust==0.2.0
 conda-libmamba-solver==23.9.1
 conda-package-handling==2.2.0
 conda_package_streaming==0.9.0
-cryptography==41.0.4
+cryptography==42.0.0
 cytoolz==0.12.0
 dask==2023.6.0
 filelock==3.9.0
